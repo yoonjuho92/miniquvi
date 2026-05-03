@@ -7,6 +7,7 @@ import {
 } from "../../catalog";
 import { executeReadOnlySql } from "../../sql";
 import type { ConnectionConfig } from "../../db/introspect/types";
+import { createReport } from "../../report";
 
 /** What the model sees in `tools`. */
 export function makeAgentTools(): ChatCompletionTool[] {
@@ -75,6 +76,143 @@ export function makeAgentTools(): ChatCompletionTool[] {
     {
       type: "function",
       function: {
+        name: "make_plan",
+        description:
+          "Sketch a short numbered plan BEFORE other tool calls. Use only for non-trivial questions (3+ tables, comparisons across timeframes, multi-aggregation reports). Skip for one-shot lookups. The plan is recorded in the conversation; you can revise by calling `make_plan` again.",
+        parameters: {
+          type: "object",
+          properties: {
+            goal: {
+              type: "string",
+              description: "Restated user goal in one sentence.",
+            },
+            steps: {
+              type: "array",
+              items: { type: "string" },
+              description: "Ordered, concrete steps. 2–6 items.",
+            },
+          },
+          required: ["goal", "steps"],
+          additionalProperties: false,
+        },
+      },
+    },
+    {
+      type: "function",
+      function: {
+        name: "render_report",
+        description:
+          "Render an HTML report from structured sections. Use when the user asks for a 보고서 / report / 요약본, or when results span several queries that benefit from a polished document. Returns a URL the user can open. Call AFTER you've gathered every number you need — DO NOT invent values.",
+        parameters: {
+          type: "object",
+          properties: {
+            title: { type: "string" },
+            subtitle: { type: "string" },
+            summary: {
+              type: "string",
+              description:
+                "Executive summary, 1–3 short paragraphs. Markdown allowed: **bold**, *italic*, `code`, lists.",
+            },
+            kpis: {
+              type: "array",
+              description: "Up to 8 headline metrics rendered as cards.",
+              items: {
+                type: "object",
+                properties: {
+                  label: { type: "string" },
+                  value: { type: "string" },
+                  hint: { type: "string" },
+                },
+                required: ["label", "value"],
+                additionalProperties: false,
+              },
+            },
+            sections: {
+              type: "array",
+              description: "Body sections in order. At least one.",
+              items: {
+                type: "object",
+                properties: {
+                  heading: { type: "string" },
+                  body: {
+                    type: "string",
+                    description: "Optional prose. Markdown allowed.",
+                  },
+                  table: {
+                    type: "object",
+                    properties: {
+                      caption: { type: "string" },
+                      columns: {
+                        type: "array",
+                        items: { type: "string" },
+                      },
+                      rows: {
+                        type: "array",
+                        description:
+                          "Each row is an array of pre-formatted strings aligned with `columns`. Stringify numbers (e.g. \"1,234\", \"45.6%\") and dates yourself before passing.",
+                        items: {
+                          type: "array",
+                          items: { type: "string" },
+                        },
+                      },
+                    },
+                    required: ["columns", "rows"],
+                    additionalProperties: false,
+                  },
+                  chart: {
+                    type: "object",
+                    description:
+                      "A Chart.js chart rendered inline. Use raw numeric values (NOT formatted strings) in `datasets[].data`. Pick the type per the rule: `bar` for category comparison, `line` for time series, `doughnut`/`pie` for share-of-total. Stacked bars require `stacked: true` AND parts that sum to a meaningful total.",
+                    properties: {
+                      type: {
+                        type: "string",
+                        enum: ["bar", "line", "pie", "doughnut"],
+                      },
+                      title: { type: "string" },
+                      labels: {
+                        type: "array",
+                        description:
+                          "X-axis tick labels (bar/line) or slice labels (pie/doughnut). Length must equal `datasets[].data.length`.",
+                        items: { type: "string" },
+                      },
+                      datasets: {
+                        type: "array",
+                        description:
+                          "One entry per series. For pie/doughnut only the first dataset is used. Each `data[i]` is the raw number for `labels[i]`.",
+                        items: {
+                          type: "object",
+                          properties: {
+                            label: { type: "string" },
+                            data: {
+                              type: "array",
+                              items: { type: "number" },
+                            },
+                          },
+                          required: ["label", "data"],
+                          additionalProperties: false,
+                        },
+                      },
+                      stacked: { type: "boolean" },
+                      xAxisLabel: { type: "string" },
+                      yAxisLabel: { type: "string" },
+                    },
+                    required: ["type", "labels", "datasets"],
+                    additionalProperties: false,
+                  },
+                },
+                required: ["heading"],
+                additionalProperties: false,
+              },
+            },
+          },
+          required: ["title", "sections"],
+          additionalProperties: false,
+        },
+      },
+    },
+    {
+      type: "function",
+      function: {
         name: "run_sql",
         description:
           "Execute a single read-only SQL query (SELECT / WITH / EXPLAIN / VALUES). " +
@@ -127,6 +265,10 @@ export async function dispatchTool(
       return await getRelationsTool(rawArgs, ctx);
     case "run_sql":
       return await runSqlTool(rawArgs, ctx);
+    case "make_plan":
+      return await makePlanTool(rawArgs);
+    case "render_report":
+      return await renderReportTool(rawArgs);
     default:
       return errorResult(`unknown tool "${name}"`);
   }
@@ -249,6 +391,55 @@ async function runSqlTool(
       shownToModel: Math.min(result.rows.length, MODEL_ROW_PREVIEW),
     }),
   };
+}
+
+async function makePlanTool(rawArgs: unknown): Promise<DispatchResult> {
+  const args = (rawArgs ?? {}) as { goal?: unknown; steps?: unknown };
+  const goal = typeof args.goal === "string" ? args.goal.trim() : "";
+  const stepsRaw = Array.isArray(args.steps) ? args.steps : [];
+  const steps = stepsRaw
+    .filter((s): s is string => typeof s === "string" && s.trim().length > 0)
+    .map((s) => s.trim());
+  if (!goal || steps.length === 0) {
+    return errorResult("make_plan needs a non-empty `goal` and at least one step");
+  }
+  return {
+    ok: true,
+    display: { goal, steps },
+    modelContent: JSON.stringify({
+      ok: true,
+      note: "Plan recorded. Now execute it. You may call make_plan again to revise if findings warrant.",
+      stepCount: steps.length,
+    }),
+  };
+}
+
+async function renderReportTool(rawArgs: unknown): Promise<DispatchResult> {
+  try {
+    const created = await createReport(rawArgs);
+    return {
+      ok: true,
+      display: {
+        id: created.id,
+        url: created.url,
+        title: created.title,
+      },
+      modelContent: JSON.stringify({
+        ok: true,
+        id: created.id,
+        url: created.url,
+        note: "Report rendered. Mention the URL in your final reply so the user can open it.",
+      }),
+    };
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : "render_report failed";
+    return {
+      ok: false,
+      display: { error: message },
+      modelContent: JSON.stringify({ ok: false, error: message }),
+    };
+  }
 }
 
 function errorResult(message: string): DispatchResult {

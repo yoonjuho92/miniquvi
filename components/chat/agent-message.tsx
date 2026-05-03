@@ -10,6 +10,9 @@ import {
   ChevronRight,
   Copy,
   Database,
+  ExternalLink,
+  FileText,
+  ListOrdered,
   ListTree,
   Loader2,
   Network,
@@ -107,7 +110,11 @@ function pairToolEvents(events: AgentEvent[]): ToolPair[] {
 // ---------------------------------------------------------------------------
 
 function ToolStep({ pair }: { pair: ToolPair }) {
-  const [open, setOpen] = useState(pair.call.name === "run_sql");
+  const [open, setOpen] = useState(
+    pair.call.name === "run_sql" ||
+      pair.call.name === "make_plan" ||
+      pair.call.name === "render_report",
+  );
   const { call, result } = pair;
   const summary = renderToolSummary(call, result);
   const failed = result && !result.ok;
@@ -150,6 +157,10 @@ function ToolIcon({ name }: { name: string }) {
       return <Network {...props} />;
     case "run_sql":
       return <Database {...props} />;
+    case "make_plan":
+      return <ListOrdered {...props} />;
+    case "render_report":
+      return <FileText {...props} />;
     default:
       return <Wrench {...props} />;
   }
@@ -168,6 +179,15 @@ function renderToolSummary(call: ToolCallRecord, result: ToolResultRecord | null
     if (call.name === "run_sql") {
       const a = call.args as { sql?: string } | undefined;
       return a?.sql ? `· ${a.sql.replace(/\s+/g, " ").slice(0, 60)}…` : "";
+    }
+    if (call.name === "make_plan") {
+      const a = call.args as { steps?: unknown[] } | undefined;
+      const n = Array.isArray(a?.steps) ? a!.steps.length : 0;
+      return n ? `(${n} steps)` : "";
+    }
+    if (call.name === "render_report") {
+      const a = call.args as { title?: string } | undefined;
+      return a?.title ? `· ${a.title}` : "";
     }
     return "";
   }
@@ -188,6 +208,14 @@ function renderToolSummary(call: ToolCallRecord, result: ToolResultRecord | null
       const tr = d.truncated ? "+" : "";
       const ms = d.durationMs as number | undefined;
       return `→ ${rc ?? 0}${tr} rows · ${ms ?? 0}ms`;
+    }
+    case "make_plan": {
+      const steps = (d.steps as unknown[]) ?? [];
+      return `→ ${steps.length} steps`;
+    }
+    case "render_report": {
+      const title = d.title as string | undefined;
+      return title ? `→ ${title}` : "→ ready";
     }
     default:
       return "";
@@ -214,6 +242,8 @@ function ArgsBlock({ args }: { args: unknown }) {
 function ResultBlock({ name, display }: { name: string; display: unknown }) {
   if (name === "run_sql") return <SqlResultBlock display={display} />;
   if (name === "get_table") return null; // markdown is huge — skip in the UI
+  if (name === "make_plan") return <PlanResultBlock display={display} />;
+  if (name === "render_report") return <ReportResultBlock display={display} />;
   return (
     <div>
       <div className="mb-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
@@ -222,6 +252,68 @@ function ResultBlock({ name, display }: { name: string; display: unknown }) {
       <pre className="overflow-x-auto rounded bg-background px-2 py-1 text-[11px]">
         <code>{JSON.stringify(display, null, 2)}</code>
       </pre>
+    </div>
+  );
+}
+
+function PlanResultBlock({ display }: { display: unknown }) {
+  const d = display as
+    | { goal?: string; steps?: string[]; error?: string }
+    | undefined;
+  if (!d || d.error) {
+    return (
+      <p className="text-[11px] text-destructive">{d?.error ?? "plan failed"}</p>
+    );
+  }
+  return (
+    <div className="space-y-1.5">
+      {d.goal && (
+        <p className="text-[12px]">
+          <span className="text-[10px] uppercase tracking-wide text-muted-foreground mr-1.5">
+            goal
+          </span>
+          {d.goal}
+        </p>
+      )}
+      {d.steps && d.steps.length > 0 && (
+        <ol className="ml-4 list-decimal space-y-0.5 text-[12px]">
+          {d.steps.map((s, i) => (
+            <li key={i}>{s}</li>
+          ))}
+        </ol>
+      )}
+    </div>
+  );
+}
+
+function ReportResultBlock({ display }: { display: unknown }) {
+  const d = display as
+    | { id?: string; url?: string; title?: string; error?: string }
+    | undefined;
+  if (!d || d.error || !d.url) {
+    return (
+      <p className="text-[11px] text-destructive">
+        {d?.error ?? "report failed"}
+      </p>
+    );
+  }
+  return (
+    <div className="space-y-1.5">
+      <a
+        href={d.url}
+        target="_blank"
+        rel="noreferrer"
+        className="inline-flex items-center gap-1.5 rounded border border-border bg-background px-2 py-1 text-[12px] hover:bg-muted"
+      >
+        <FileText size={12} />
+        <span>{d.title ?? "Report"}</span>
+        <ExternalLink size={10} className="text-muted-foreground" />
+      </a>
+      {d.id && (
+        <p className="font-mono text-[10px] text-muted-foreground">
+          {d.url}
+        </p>
+      )}
     </div>
   );
 }

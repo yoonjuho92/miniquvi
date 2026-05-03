@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>전체 매출 요약 리포트</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #0f172a;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --soft: #f8fafc;
+  --soft-2: #f1f5f9;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Pretendard", "Apple SD Gothic Neo", sans-serif;
+  color: var(--fg);
+  background: var(--soft);
+  line-height: 1.55;
+  font-size: 14px;
+}
+main {
+  max-width: 820px;
+  margin: 32px auto;
+  padding: 32px 40px 40px;
+  background: var(--bg);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+.report-header {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 18px;
+  margin-bottom: 24px;
+}
+.report-header h1 { margin: 0; font-size: 24px; letter-spacing: -0.01em; }
+.report-header .subtitle { margin: 6px 0 0; color: var(--muted); }
+.report-header .meta { margin: 10px 0 0; font-size: 11px; color: var(--muted); }
+.report-header .rid { font-family: ui-monospace, "JetBrains Mono", monospace; }
+.summary p { margin: 0.6em 0; }
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin: 20px 0 28px;
+}
+.kpi {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  background: var(--soft);
+}
+.kpi-label {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.kpi-value { font-size: 22px; font-weight: 600; margin-top: 4px; }
+.kpi-hint { font-size: 11px; color: var(--muted); margin-top: 4px; }
+.block { margin: 28px 0; }
+.block h2 {
+  font-size: 16px;
+  margin: 0 0 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+.block p { margin: 0.6em 0; }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 10px 0;
+  font-size: 13px;
+}
+caption {
+  text-align: left;
+  color: var(--muted);
+  font-size: 11px;
+  padding: 4px 0;
+}
+th, td {
+  border-bottom: 1px solid var(--border);
+  padding: 6px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--soft-2);
+  font-weight: 600;
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+tr:hover td { background: var(--soft); }
+ul, ol { padding-left: 1.4em; margin: 0.5em 0; }
+li { margin: 0.2em 0; }
+strong { font-weight: 600; }
+em { font-style: italic; }
+code {
+  background: var(--soft-2);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-family: ui-monospace, "JetBrains Mono", monospace;
+}
+@media print {
+  body { background: #fff; }
+  main { box-shadow: none; max-width: none; padding: 0; margin: 0; }
+}
+</style>
+</head>
+<body>
+<main>
+  <header class="report-header">
+    <h1>전체 매출 요약 리포트</h1>
+    <p class="subtitle">전체 기간 기준 주문 및 매출 요약</p>
+    <p class="meta">Generated 2026-05-02T12:19:37.851Z · <span class="rid">4e047d3c8609</span></p>
+  </header>
+  <section class="summary"><p>전체 기간 기준으로 주문 데이터를 집계한 결과, 총매출은 <strong>1,265,793.04</strong>이며 총 <strong>830건</strong>의 주문이 발생했습니다. 주문당 평균 매출은 <strong>1,525.05</strong>이고, 총 판매수량은 <strong>51,317개</strong>입니다.</p>
+<p>데이터 기간은 <strong>1996-07-03 ~ 1998-05-05</strong>이며, 최근 12개월 추이를 보면 1998년 3월 매출이 가장 높았고 마지막 월인 1998년 5월은 월중 데이터만 포함된 것으로 보입니다.</p></section>
+  <section class="kpis"><div class="kpi">
+      <div class="kpi-label">총매출</div>
+      <div class="kpi-value">1,265,793.04</div>
+      
+    </div>
+<div class="kpi">
+      <div class="kpi-label">주문 수</div>
+      <div class="kpi-value">830건</div>
+      
+    </div>
+<div class="kpi">
+      <div class="kpi-label">평균 주문금액</div>
+      <div class="kpi-value">1,525.05</div>
+      
+    </div>
+<div class="kpi">
+      <div class="kpi-label">총 판매수량</div>
+      <div class="kpi-value">51,317개</div>
+      
+    </div>
+<div class="kpi">
+      <div class="kpi-label">총 운임</div>
+      <div class="kpi-value">64,942.70</div>
+      
+    </div>
+<div class="kpi">
+      <div class="kpi-label">데이터 시작일</div>
+      <div class="kpi-value">1996-07-03</div>
+      
+    </div>
+<div class="kpi">
+      <div class="kpi-label">데이터 종료일</div>
+      <div class="kpi-value">1998-05-05</div>
+      
+    </div></section>
+  <section class="block">
+    <h2>핵심 요약</h2>
+    
+    <table><thead><tr><th>지표</th><th>값</th></tr></thead><tbody><tr><td>총매출</td><td>1,265,793.04</td></tr><tr><td>주문 수</td><td>830</td></tr><tr><td>평균 주문금액</td><td>1,525.05</td></tr><tr><td>총 판매수량</td><td>51,317</td></tr><tr><td>총 운임</td><td>64,942.70</td></tr><tr><td>첫 주문일</td><td>1996-07-03</td></tr><tr><td>마지막 주문일</td><td>1998-05-05</td></tr></tbody></table>
+  </section>
+<section class="block">
+    <h2>최근 12개월 월별 매출 추이</h2>
+    <p>월별 매출은 <code>order_details</code>의 <code>unit_price <em> quantity </em> (1 - discount)</code> 기준으로 계산했습니다.</p>
+    <table><thead><tr><th>월</th><th>매출</th><th>주문 수</th><th>판매수량</th></tr></thead><tbody><tr><td>1998-05</td><td>18,333.63</td><td>14</td><td>921</td></tr><tr><td>1998-04</td><td>123,798.68</td><td>74</td><td>4,680</td></tr><tr><td>1998-03</td><td>104,854.16</td><td>73</td><td>4,065</td></tr><tr><td>1998-02</td><td>99,415.29</td><td>54</td><td>3,115</td></tr><tr><td>1998-01</td><td>94,222.11</td><td>55</td><td>3,466</td></tr><tr><td>1997-12</td><td>71,398.43</td><td>48</td><td>2,682</td></tr><tr><td>1997-11</td><td>43,533.81</td><td>34</td><td>1,856</td></tr><tr><td>1997-10</td><td>66,749.23</td><td>38</td><td>2,679</td></tr><tr><td>1997-09</td><td>55,629.24</td><td>37</td><td>2,343</td></tr><tr><td>1997-08</td><td>47,287.67</td><td>33</td><td>1,861</td></tr><tr><td>1997-07</td><td>51,020.86</td><td>33</td><td>2,054</td></tr><tr><td>1997-06</td><td>36,362.80</td><td>30</td><td>1,635</td></tr></tbody></table>
+  </section>
+</main>
+</body>
+</html>

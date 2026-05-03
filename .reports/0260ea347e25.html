@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>최근 30일 전체 매출 요약 리포트</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #0f172a;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --soft: #f8fafc;
+  --soft-2: #f1f5f9;
+  --code-bg: #0f172a;
+  --code-fg: #e2e8f0;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Pretendard", "Apple SD Gothic Neo", sans-serif;
+  color: var(--fg);
+  background: var(--soft);
+  line-height: 1.55;
+  font-size: 14px;
+}
+main {
+  max-width: 820px;
+  margin: 32px auto;
+  padding: 32px 40px 40px;
+  background: var(--bg);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+.report-header {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 18px;
+  margin-bottom: 24px;
+}
+.report-header h1 { margin: 0; font-size: 24px; letter-spacing: -0.01em; }
+.report-header .subtitle { margin: 6px 0 0; color: var(--muted); }
+.report-header .meta { margin: 10px 0 0; font-size: 11px; color: var(--muted); }
+.report-header .rid { font-family: ui-monospace, "JetBrains Mono", monospace; }
+.summary p { margin: 0.6em 0; }
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin: 20px 0 28px;
+}
+.kpi {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  background: var(--soft);
+}
+.kpi-label {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.kpi-value { font-size: 22px; font-weight: 600; margin-top: 4px; }
+.kpi-hint { font-size: 11px; color: var(--muted); margin-top: 4px; }
+.block { margin: 28px 0; }
+.block h2 {
+  font-size: 16px;
+  margin: 0 0 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+.block p { margin: 0.6em 0; }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 10px 0;
+  font-size: 13px;
+}
+caption {
+  text-align: left;
+  color: var(--muted);
+  font-size: 11px;
+  padding: 4px 0;
+}
+th, td {
+  border-bottom: 1px solid var(--border);
+  padding: 6px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--soft-2);
+  font-weight: 600;
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+tr:hover td { background: var(--soft); }
+pre.sql {
+  background: var(--code-bg);
+  color: var(--code-fg);
+  padding: 12px 14px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-size: 12px;
+}
+pre.sql code { font-family: ui-monospace, "JetBrains Mono", monospace; }
+ul, ol { padding-left: 1.4em; margin: 0.5em 0; }
+li { margin: 0.2em 0; }
+strong { font-weight: 600; }
+em { font-style: italic; }
+code {
+  background: var(--soft-2);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-family: ui-monospace, "JetBrains Mono", monospace;
+}
+@media print {
+  body { background: #fff; }
+  main { box-shadow: none; max-width: none; padding: 0; margin: 0; }
+}
+</style>
+</head>
+<body>
+<main>
+  <header class="report-header">
+    <h1>최근 30일 전체 매출 요약 리포트</h1>
+    <p class="subtitle">데이터셋 최신 주문일 기준 최근 30일 (1998-04-06 ~ 1998-05-05)</p>
+    <p class="meta">Generated 2026-05-02T12:17:51.004Z · <span class="rid">0260ea347e25</span></p>
+  </header>
+  <section class="summary"><p>최근 30일 기준 전체 매출은 <strong>124,504.87</strong>이며, 총 <strong>74건</strong>의 주문이 발생했습니다. 평균 주문금액은 <strong>1,682.50</strong>입니다.</p>
+<p>현재 데이터셋의 최신 주문일이 1998-05-05이므로, 실제 오늘 날짜 기준 최근 30일에는 데이터가 없어 <strong>데이터셋 최신일 기준 최근 30일</strong>로 집계했습니다. 매출은 <code>order_details</code>의 할인 반영 상품 매출과 <code>orders.freight</code>를 합산해 계산했습니다.</p></section>
+  <section class="kpis"><div class="kpi">
+      <div class="kpi-label">총매출</div>
+      <div class="kpi-value">124,504.87</div>
+      <div class="kpi-hint">상품매출 + 운임</div>
+    </div>
+<div class="kpi">
+      <div class="kpi-label">상품매출</div>
+      <div class="kpi-value">118,307.13</div>
+      
+    </div>
+<div class="kpi">
+      <div class="kpi-label">운임 매출</div>
+      <div class="kpi-value">6,197.74</div>
+      
+    </div>
+<div class="kpi">
+      <div class="kpi-label">주문 수</div>
+      <div class="kpi-value">74건</div>
+      
+    </div>
+<div class="kpi">
+      <div class="kpi-label">평균 주문금액</div>
+      <div class="kpi-value">1,682.50</div>
+      
+    </div>
+<div class="kpi">
+      <div class="kpi-label">집계 시작일</div>
+      <div class="kpi-value">1998-04-06</div>
+      
+    </div>
+<div class="kpi">
+      <div class="kpi-label">집계 종료일</div>
+      <div class="kpi-value">1998-05-05</div>
+      
+    </div></section>
+  <section class="block">
+    <h2>핵심 요약</h2>
+    <ul><li>총매출: <strong>124,504.87</strong></li><li>주문 수: <strong>74건</strong></li><li>평균 주문금액: <strong>1,682.50</strong></li><li>데이터셋 최신 주문일: <strong>1998-05-05</strong></li></ul>
+    
+    
+  </section>
+<section class="block">
+    <h2>일별 매출 추이</h2>
+    
+    <table><caption>주문일 기준 일별 주문 수와 매출</caption><thead><tr><th>order_date</th><th>orders_count</th><th>daily_revenue</th><th>avg_order_value</th></tr></thead><tbody><tr><td>1998-04-06</td><td>3</td><td>1,281.85</td><td>427.28</td></tr><tr><td>1998-04-07</td><td>3</td><td>8,272.11</td><td>2,757.37</td></tr><tr><td>1998-04-08</td><td>4</td><td>5,070.66</td><td>1,267.67</td></tr><tr><td>1998-04-09</td><td>3</td><td>1,419.05</td><td>473.02</td></tr><tr><td>1998-04-12</td><td>3</td><td>9,170.08</td><td>3,056.69</td></tr><tr><td>1998-04-13</td><td>4</td><td>10,311.22</td><td>2,577.81</td></tr><tr><td>1998-04-14</td><td>3</td><td>3,417.43</td><td>1,139.14</td></tr><tr><td>1998-04-15</td><td>3</td><td>4,454.48</td><td>1,484.83</td></tr><tr><td>1998-04-16</td><td>4</td><td>28,892.75</td><td>7,223.19</td></tr><tr><td>1998-04-19</td><td>3</td><td>4,175.86</td><td>1,391.95</td></tr><tr><td>1998-04-20</td><td>3</td><td>3,980.39</td><td>1,326.80</td></tr><tr><td>1998-04-21</td><td>4</td><td>2,694.60</td><td>673.65</td></tr><tr><td>1998-04-22</td><td>3</td><td>3,537.84</td><td>1,179.28</td></tr><tr><td>1998-04-23</td><td>3</td><td>1,695.56</td><td>565.19</td></tr><tr><td>1998-04-26</td><td>4</td><td>5,415.51</td><td>1,353.88</td></tr><tr><td>1998-04-27</td><td>3</td><td>6,172.71</td><td>2,057.57</td></tr><tr><td>1998-04-28</td><td>3</td><td>2,862.07</td><td>954.02</td></tr><tr><td>1998-04-29</td><td>4</td><td>2,662.00</td><td>665.50</td></tr><tr><td>1998-04-30</td><td>3</td><td>5,536.29</td><td>1,845.43</td></tr><tr><td>1998-05-03</td><td>3</td><td>2,579.33</td><td>859.78</td></tr><tr><td>1998-05-04</td><td>4</td><td>8,053.00</td><td>2,013.25</td></tr><tr><td>1998-05-05</td><td>4</td><td>2,850.10</td><td>712.52</td></tr></tbody></table>
+    <pre class="sql"><code>WITH recent_orders AS (
+  SELECT o.order_id, o.order_date, COALESCE(o.freight, 0)::numeric AS freight
+  FROM public.orders o
+  WHERE o.order_date &gt;= (
+    SELECT MAX(order_date) - INTERVAL &#39;29 days&#39; FROM public.orders
+  )
+    AND o.order_date &lt;= (
+    SELECT MAX(order_date) FROM public.orders
+  )
+), order_totals AS (
+  SELECT ro.order_id,
+         ro.order_date,
+         SUM((od.unit_price::numeric * od.quantity::numeric) * (1 - od.discount::numeric)) AS line_revenue,
+         ro.freight
+  FROM recent_orders ro
+  JOIN public.order_details od ON od.order_id = ro.order_id
+  GROUP BY ro.order_id, ro.order_date, ro.freight
+)
+SELECT order_date,
+       COUNT(*) AS orders_count,
+       ROUND(SUM(line_revenue + freight), 2) AS daily_revenue,
+       ROUND(AVG(line_revenue + freight), 2) AS avg_order_value
+FROM order_totals
+GROUP BY order_date
+ORDER BY order_date</code></pre>
+  </section>
+<section class="block">
+    <h2>고액 주문 TOP 5</h2>
+    
+    <table><caption>최근 30일 기준 주문금액 상위 5건</caption><thead><tr><th>order_id</th><th>order_date</th><th>order_revenue</th></tr></thead><tbody><tr><td>11030</td><td>1998-04-16</td><td>13,445.80</td></tr><tr><td>11032</td><td>1998-04-16</td><td>9,508.69</td></tr><tr><td>11017</td><td>1998-04-12</td><td>7,504.26</td></tr><tr><td>11021</td><td>1998-04-13</td><td>6,603.42</td></tr><tr><td>11072</td><td>1998-05-04</td><td>5,476.64</td></tr></tbody></table>
+    <pre class="sql"><code>WITH recent_orders AS (
+  SELECT o.order_id, o.order_date, COALESCE(o.freight, 0)::numeric AS freight
+  FROM public.orders o
+  WHERE o.order_date &gt;= (
+    SELECT MAX(order_date) - INTERVAL &#39;29 days&#39; FROM public.orders
+  )
+    AND o.order_date &lt;= (
+    SELECT MAX(order_date) FROM public.orders
+  )
+), order_totals AS (
+  SELECT ro.order_id,
+         ro.order_date,
+         SUM((od.unit_price::numeric * od.quantity::numeric) * (1 - od.discount::numeric)) AS line_revenue,
+         ro.freight,
+         SUM((od.unit_price::numeric * od.quantity::numeric) * (1 - od.discount::numeric)) + ro.freight AS order_revenue
+  FROM recent_orders ro
+  JOIN public.order_details od ON od.order_id = ro.order_id
+  GROUP BY ro.order_id, ro.order_date, ro.freight
+)
+SELECT order_id,
+       order_date,
+       ROUND(order_revenue, 2) AS order_revenue
+FROM order_totals
+ORDER BY order_revenue DESC, order_id
+LIMIT 5</code></pre>
+  </section>
+</main>
+</body>
+</html>
